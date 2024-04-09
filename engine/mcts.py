@@ -18,11 +18,20 @@ class MCTS:
         reward = self._simulate(leaf)
         self._backpropagate(path, reward)
 
+    def _select_uct(self, node: Node) -> Node:
+        log_Ni = math.log(sum(self.N[child]
+                              for child in self.children[node]))
+        def _ucb1(n: Node) -> float:
+            wi, ni = self.Q[n], self.N[n]
+            return wi / ni + self.weight * math.sqrt(log_Ni / ni)
+
+        return max(self.children[node], key=_ucb1)
+
     def _select(self, node: Node) -> List[Node]:
         path = [node]
         while node in self.children and not node.is_terminal():
             if all(child in self.N for child in self.children[node]):
-                node = self.select_uct(node)
+                node = self._select_uct(node)
             else:
                 # Not all children are visited, select one at random
                 unvisited = [child for child in self.children[node]
@@ -49,11 +58,3 @@ class MCTS:
             self.N[node] += 1
             self.Q[node] += reward
             reward = 1 - reward # 1 for me and 0 for thee
-
-    def select_uct(self, node: Node) -> Node:
-        log_Ni = math.log(sum(self.N[child] for child in self.children[node]))
-        def _ucb1(n: Node) -> float:
-            wi, ni = self.Q[n], self.N[n]
-            return wi / ni + self.weight * math.sqrt(log_Ni / ni)
-
-        return max(self.children[node], key=_ucb1)

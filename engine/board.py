@@ -1,5 +1,5 @@
 from node import Node
-from typing import Optional, List
+from typing import Optional
 
 class Board(Node):
     def __init__(self):
