@@ -5,20 +5,21 @@ import random
 class TicTacToeBoard(Board):
     BOARD_SIZE = 3
     EMPTY = None
+    WIN_LINES = [
+        [(0, 0), (0, 1), (0, 2)],
+        [(1, 0), (1, 1), (1, 2)],
+        [(2, 0), (2, 1), (2, 2)],
+        [(0, 0), (1, 0), (2, 0)],
+        [(0, 1), (1, 1), (2, 1)],
+        [(0, 2), (1, 2), (2, 2)],
+        [(0, 0), (1, 1), (2, 2)],
+        [(0, 2), (1, 1), (2, 0)],
+    ]
 
     def __init__(self):
         super().__init__()
-        self.space: List[List[Optional[bool]]] = [[self.EMPTY, self.EMPTY, self.EMPTY]
-                                                  for _ in range(self.BOARD_SIZE)]
-        self.winning_lines: List[List[Tuple[int, int]]] = [
-            [(0, 0), (0, 1), (0, 2)],
-            [(1, 0), (1, 1), (1, 2)],
-            [(2, 0), (2, 1), (2, 2)],
-            [(0, 0), (1, 0), (2, 0)],
-            [(0, 1), (1, 1), (2, 1)],
-            [(0, 2), (1, 2), (2, 2)],
-            [(0, 0), (1, 1), (2, 2)],
-            [(0, 2), (1, 1), (2, 0)],
+        self.space: List[List[Optional[bool]]] = [
+            [self.EMPTY, self.EMPTY, self.EMPTY] for _ in range(self.BOARD_SIZE)
         ]
 
     def _deep_copy(self) -> 'TicTacToeBoard':
@@ -30,7 +31,7 @@ class TicTacToeBoard(Board):
         return copy
 
     def _check_win(self) -> Optional[bool]:
-        for line in self.winning_lines:
+        for line in self.WIN_LINES:
             values = [self.space[x][y] for x, y in line]
             if values in ([True, True, True], [False, False, False]):
                 return values[0]
@@ -72,9 +73,6 @@ class TicTacToeBoard(Board):
         succ._update_state()
         return succ
 
-    def is_terminal(self) -> bool:
-        return self.terminal
-
     def get_reward(self) -> float:
         if not self.terminal:
             return 0.0  # Game has not finished
@@ -90,3 +88,9 @@ class TicTacToeBoard(Board):
             print(' | '.join(symbols[cell] for cell in row),end="")
             print(' |')
             print('-' * 13)
+
+    def __eq__(self, other: 'TicTacToeBoard'):
+        return isinstance(other, TicTacToeBoard) and self.space == other.space
+
+    def __hash__(self):
+        return hash(tuple(tuple(row) for row in self.space))

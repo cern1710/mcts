@@ -1,5 +1,5 @@
 from mcts import MCTS
-from tictactoe import TicTacToeBoard
+from opt_tictactoe import TicTacToeBoard
 
 def tictactoe_engine(weight: float, rollout: int, display=True) -> int:
     game_board = TicTacToeBoard()

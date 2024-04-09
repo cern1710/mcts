@@ -6,7 +6,7 @@ import numpy as np
 
 class MCTS:
     """Monte Carlo Tree Search object."""
-    def __init__(self, weight: float = 1.0) -> None:
+    def __init__(self, weight: float = 0.05) -> None:
         self.Q: Dict[Node, float] = defaultdict(int)
         self.N: Dict[Node, int] = defaultdict(int)
         self.children: Dict[Node, Set[Node]] = {}
