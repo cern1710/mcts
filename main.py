@@ -8,12 +8,12 @@ sys.path.append(os.path.join(current_dir, "engine"))
 from games import game_engines
 
 if __name__ == "__main__":
-    weight = 8e-2
-    rollout = 90
+    weight = 1e-1
+    rollout = 120
     display = False
     player = False
 
-    iter = 1000
+    iter = 500
     total = [0] * 3
 
     for i in range(iter):
