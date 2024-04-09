@@ -38,7 +38,7 @@ class TicTacToeBoard(Board):
         if self.terminal:
             return None
         empty_cells: List[Tuple[int, int]] = [(i, j) for j in range(3)
-                       for i in range(3) if self.space[i][j]]
+                       for i in range(3) if self.space[i][j] is None]
         if not empty_cells:
             return None
         move: Tuple[int, int] = random.choice(empty_cells)
