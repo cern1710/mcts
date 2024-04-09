@@ -5,7 +5,7 @@ class Node(Protocol):
     def find_successors(self) -> Set['Node']:
         return set()
 
-    def find_rand_successor(self) -> Optional['Node']:
+    def find_next_successor(self) -> Optional['Node']:
         return None
 
     def is_terminal(self) -> bool:

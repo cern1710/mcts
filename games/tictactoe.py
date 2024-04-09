@@ -61,7 +61,7 @@ class TicTacToeBoard(Board):
                 successors.add(succ)
         return successors
 
-    def find_rand_successor(self) -> Optional['TicTacToeBoard']:
+    def find_next_successor(self) -> Optional['TicTacToeBoard']:
         empty_cells: List[Tuple[int, int]] = [(i, j) for j in range(3)
                        for i in range(3) if self.space[i][j] is self.EMPTY]
         if not empty_cells:

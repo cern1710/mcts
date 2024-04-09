@@ -2,7 +2,7 @@ from node import Node
 from random import choice
 from typing import Dict, List, Set
 from collections import defaultdict
-import numpy as np
+import math
 
 class MCTS:
     """Monte Carlo Tree Search object."""
@@ -41,7 +41,7 @@ class MCTS:
 
     def _simulate(self, node: Node) -> float:
         while not node.is_terminal():
-            node = node.find_rand_successor() or node
+            node = node.find_next_successor() or node
         return node.get_reward()
 
     def _backpropagate(self, path: List[Node], reward: float) -> None:
@@ -51,9 +51,9 @@ class MCTS:
             reward = 1 - reward # 1 for me and 0 for thee
 
     def select_uct(self, node: Node) -> Node:
-        log_Ni = np.log(sum(self.N[child] for child in self.children[node]))
+        log_Ni = math.log(sum(self.N[child] for child in self.children[node]))
         def _ucb1(n: Node) -> float:
             wi, ni = self.Q[n], self.N[n]
-            return wi / ni + self.weight * np.sqrt(log_Ni / ni)
+            return wi / ni + self.weight * math.sqrt(log_Ni / ni)
 
         return max(self.children[node], key=_ucb1)

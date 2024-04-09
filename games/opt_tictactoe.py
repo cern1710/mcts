@@ -18,6 +18,7 @@ class TicTacToeBoard(Board):
         0b001010100,
     ]
     END_STATE = 0b111111111
+    CORNERS = [0, 2, 6, 8]
 
     def __init__(self):
         super().__init__()
@@ -77,10 +78,45 @@ class TicTacToeBoard(Board):
         if not empty_positions:
             self.terminal = True
             return None
-        move = random.choice(empty_positions)
+        pos = random.choice(empty_positions)
         succ = self._deep_copy()
-        succ._update_state(move)
+        succ._update_state(pos)
         return succ
+
+    def find_next_successor(self) -> Optional['TicTacToeBoard']:
+        """Heuristic-based method to find the next successor.
+
+        Steps:
+          1. Check if we have an immediate win
+          2. See if we can take the center
+          3. If not, try and take the corners
+          4. Otherwise, find a random successor
+        """
+        # Check immediate win
+        for move in range(9):
+            if not self.is_valid_move(move):
+                continue
+            test_board = self._deep_copy()
+            test_board._update_state(move)
+            if test_board.terminal and test_board.winner is True:
+                return test_board
+
+        # Take center
+        if self.is_valid_move(4):
+            center_board = self._deep_copy()
+            center_board._update_state(4)
+            return center_board
+
+        # Take corners
+        random.shuffle(self.CORNERS)
+        for corner in self.CORNERS:
+            if not self.is_valid_move(corner):
+                continue
+            corner_board = self._deep_copy()
+            corner_board._update_state(corner)
+            return corner_board
+
+        return self.find_rand_successor()
 
     def get_reward(self) -> float:
         if not self.terminal:
@@ -111,9 +147,7 @@ class TicTacToeBoard(Board):
     def is_valid_move(self, pos) -> Optional[bool]:
         if pos < 0 or pos > 9:
             return False
-
-        occupied = self.player_X | self.player_O
-        return not (occupied & (1 << pos))
+        return not ((self.player_X | self.player_O) & (1 << pos))
 
     def __eq__(self, other):
         return isinstance(other, TicTacToeBoard) \

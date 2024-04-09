@@ -1,6 +1,5 @@
 import sys
 import os
-import numpy as np
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.join(current_dir, "games"))
@@ -8,12 +7,12 @@ sys.path.append(os.path.join(current_dir, "engine"))
 from games import game_engines
 
 if __name__ == "__main__":
-    weight = 1e-1
-    rollout = 120
+    weight = 0.03
+    rollout = 250
     display = False
     player = False
 
-    iter = 500
+    iter = 100
     total = [0] * 3
 
     for i in range(iter):
