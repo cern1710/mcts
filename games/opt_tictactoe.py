@@ -41,7 +41,7 @@ class TicTacToeBoard(Board):
             if (self.player_O & win_state) == win_state:
                 return False
 
-    def _make_move(self, pos:int) -> None:
+    def _make_move(self, pos: int) -> None:
         if self.turn:
             self.player_X |= 1 << pos
         else:
@@ -107,6 +107,13 @@ class TicTacToeBoard(Board):
             else:
                 board_str += ' | '
         print(board_str)
+
+    def is_valid_move(self, pos) -> Optional[bool]:
+        if pos < 0 or pos > 9:
+            return False
+
+        occupied = self.player_X | self.player_O
+        return not (occupied & (1 << pos))
 
     def __eq__(self, other):
         return isinstance(other, TicTacToeBoard) \

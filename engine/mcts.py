@@ -6,7 +6,7 @@ import numpy as np
 
 class MCTS:
     """Monte Carlo Tree Search object."""
-    def __init__(self, weight: float = 0.05) -> None:
+    def __init__(self, weight: float = 1.0) -> None:
         self.Q: Dict[Node, float] = defaultdict(int)
         self.N: Dict[Node, int] = defaultdict(int)
         self.children: Dict[Node, Set[Node]] = {}
@@ -21,11 +21,7 @@ class MCTS:
     def _select(self, node: Node) -> List[Node]:
         path = [node]
         while node in self.children and not node.is_terminal():
-            self._expand(node)
-            if node.is_terminal() or node not in self.children:
-                break
             if all(child in self.N for child in self.children[node]):
-                # Select best child using UCB
                 node = self.select_uct(node)
             else:
                 # Not all children are visited, select one at random
@@ -55,11 +51,9 @@ class MCTS:
             reward = 1 - reward # 1 for me and 0 for thee
 
     def select_uct(self, node: Node) -> Node:
+        log_Ni = np.log(sum(self.N[child] for child in self.children[node]))
         def _ucb1(n: Node) -> float:
             wi, ni = self.Q[n], self.N[n]
-            if ni == 0:  # Avoid division by zero
-                return float('inf') # INFINITE UCB
-            Ni = sum(self.N[child] for child in self.children[node])
-            return wi / ni + self.weight * np.sqrt(np.log(Ni) / ni)
+            return wi / ni + self.weight * np.sqrt(log_Ni / ni)
 
         return max(self.children[node], key=_ucb1)
