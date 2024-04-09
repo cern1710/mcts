@@ -10,7 +10,7 @@ class MCTS:
         self.Q: Dict[Node, float] = defaultdict(int)
         self.N: Dict[Node, int] = defaultdict(int)
         self.children: Dict[Node, Set[Node]] = {}
-        self.weight = weight
+        self.weight: float = weight
 
     def rollout(self, node: Node) -> None:
         path = self._select(node)
@@ -21,6 +21,9 @@ class MCTS:
     def _select(self, node: Node) -> List[Node]:
         path = [node]
         while node in self.children and not node.is_terminal():
+            self._expand(node)
+            if node.is_terminal() or node not in self.children:
+                break
             if all(child in self.N for child in self.children[node]):
                 # Select best child using UCB
                 node = self.select_uct(node)
@@ -35,7 +38,7 @@ class MCTS:
     def _expand(self, node: Node) -> None:
         if node.is_terminal():
             # No successors available; mark terminal node with set()
-            self.children[node] = Set()
+            self.children[node] = set()
         elif node not in self.children:
             # Expand node if hasn't been visited
             self.children[node] = node.find_successors()
@@ -49,11 +52,14 @@ class MCTS:
         for node in reversed(path):
             self.N[node] += 1
             self.Q[node] += reward
+            reward = 1 - reward # 1 for me and 0 for thee
 
     def select_uct(self, node: Node) -> Node:
-        def _ucb1(node: Node) -> float:
-            wi, ni = self.Q[node], self.N[node]
-            Ni = sum(self.N[leaf] for leaf in self.children[node])
-            return (wi / ni) + self.weight * np.sqrt(np.log(Ni) / self.N[node])
+        def _ucb1(n: Node) -> float:
+            wi, ni = self.Q[n], self.N[n]
+            if ni == 0:  # Avoid division by zero
+                return float('inf') # INFINITE UCB
+            Ni = sum(self.N[child] for child in self.children[node])
+            return wi / ni + self.weight * np.sqrt(np.log(Ni) / ni)
 
         return max(self.children[node], key=_ucb1)
