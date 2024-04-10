@@ -88,9 +88,10 @@ class TicTacToeBoard(Board):
 
         Steps:
           1. Check if we have an immediate win
-          2. See if we can take the center
-          3. If not, try and take the corners
-          4. Otherwise, find a random successor
+          2. Block if opponent can get a win next turn (1 step lookahead)
+          3. See if we can take the center
+          4. If not, try and take the corners
+          5. Otherwise, find a random successor
         """
         # Check immediate win
         for move in range(9):
@@ -100,6 +101,17 @@ class TicTacToeBoard(Board):
             test_board._update_state(move)
             if test_board.terminal and test_board.winner is True:
                 return test_board
+
+        # Block opponent's immediate win
+        opponent_marker = self.player_O if self.turn else self.player_X
+        for move in range(9):
+            if self.is_valid_move(move):
+                test_board = self._deep_copy()
+                potential_win = opponent_marker | (1 << move)
+                if any((potential_win & win_state) == win_state
+                       for win_state in self.WIN_STATES):
+                    test_board._update_state(move)
+                    return test_board
 
         # Take center
         if self.is_valid_move(4):
