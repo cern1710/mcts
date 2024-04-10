@@ -32,7 +32,7 @@ def tictactoe_engine(weight: float,
                      player=False) -> int:
     game_board = TicTacToeBoard()
     mcts = MCTS(weight=weight)
-    turn = 0
+    turn = 1
 
     if player == True:
         if display == True:
@@ -48,18 +48,18 @@ def tictactoe_engine(weight: float,
 
     while not game_board.is_terminal():
         if turn % 2 == 1:
-            next_move = parse_input(game_board)
-            # next_move = random_player_move(game_board)
+            # next_move = parse_input(game_board)
+            next_move = random_player_move(game_board)
             game_board = next_move
         else:
             for _ in range(rollout):
                 mcts.rollout(game_board)
-
             if game_board.terminal:
                 break
 
             # Select move with the highest visit count
-            next_move = max(game_board.find_successors(), key=lambda node: mcts.N[node])
+            next_move = max(game_board.find_successors(),
+                            key=lambda node: mcts.N[node])
             game_board = next_move
 
         if player == True:

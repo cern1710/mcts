@@ -11,11 +11,11 @@ from games import game_engines
 
 if __name__ == "__main__":
     weight = M_SQRT2
-    rollout = 250
+    rollout = 27
     display = False
     player = False
 
-    iter = 200
+    iter = 10000
     total = [0] * 3
 
     start = time.process_time()
